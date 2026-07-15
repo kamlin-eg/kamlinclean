@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة إدارة كاملين</title><link rel="stylesheet" href="style.css"></head>
+<body class="admin-body">
+<div id="loginScreen" class="login-screen">
+  <form id="loginForm" class="login-card">
+    <a class="brand center" href="index.html"><span class="brand-mark">K</span><span><b>KAMLIN</b><small>لوحة الإدارة</small></span></a>
+    <h1>دخول الإدارة</h1><p>أدخل كلمة المرور للوصول إلى بيانات الشركة.</p>
+    <input id="adminPassword" type="password" placeholder="كلمة المرور" required>
+    <button class="btn full">دخول آمن</button><small>كلمة المرور الافتراضية: <b>kamlin2026</b></small>
+    <a href="index.html">العودة للموقع</a>
+  </form>
+</div>
+
+<div id="adminApp" class="admin-app hidden">
+<aside class="sidebar">
+  <a class="brand" href="index.html"><span class="brand-mark">K</span><span><b>KAMLIN</b><small>الإدارة</small></span></a>
+  <nav id="adminNav">
+    <button data-view="dashboard" class="active">📊 الرئيسية</button>
+    <button data-view="bookings">📩 طلبات الحجز</button>
+    <button data-view="clients">👥 العملاء CRM</button>
+    <button data-view="workers">👷 العمال</button>
+    <button data-view="attendance">🕒 الحضور والغياب</button>
+    <button data-view="assignments">📍 توزيع العمل</button>
+    <button data-view="insurance">🛡️ التأمينات والرواتب</button>
+    <button data-view="inventory">🧰 الأدوات والمخزون</button>
+    <button data-view="contracts">📄 العقود والفواتير</button>
+    <button data-view="quotes">💰 عروض الأسعار</button>
+  </nav>
+  <button class="logout" onclick="logoutAdmin()">تسجيل الخروج</button>
+</aside>
+
+<div class="admin-main">
+<header class="admin-top"><button class="side-toggle" onclick="document.body.classList.toggle('sidebar-open')">☰</button><div><h1 id="viewTitle">لوحة المتابعة</h1><p id="todayText"></p></div><a class="btn small" href="index.html">عرض الموقع</a></header>
+
+<section class="admin-view active" id="view-dashboard">
+  <div class="admin-cards">
+    <article><span>طلبات الحجز</span><b id="dBookings">0</b></article><article><span>العملاء</span><b id="dClients">0</b></article>
+    <article><span>العمال</span><b id="dWorkers">0</b></article><article><span>عقود نشطة</span><b id="dContracts">0</b></article>
+    <article><span>قيمة متوقعة</span><b id="dPipeline">0</b></article><article><span>حضور اليوم</span><b id="dPresent">0</b></article>
+  </div>
+  <div class="admin-grid-2">
+    <div class="admin-panel"><h2>مهام اليوم</h2><div id="todayTasks" class="simple-list"></div></div>
+    <div class="admin-panel"><h2>متابعات العملاء</h2><div id="followups" class="simple-list"></div></div>
+  </div>
+</section>
+
+<section class="admin-view" id="view-bookings"><div class="admin-panel"><div class="panel-head"><h2>طلبات الحجز من الموقع</h2><button onclick="exportTable('bookings')">تصدير CSV</button></div><div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>المكان</th><th>الخدمة</th><th>المنطقة</th><th>التاريخ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="bookingsRows"></tbody></table></div></div></section>
+
+<section class="admin-view" id="view-clients">
+  <div class="admin-panel"><h2>إضافة / تعديل عميل</h2><form id="clientForm" class="smart-form"><input type="hidden" id="clientId"><input id="clientName" required placeholder="اسم العميل / الجهة"><input id="clientSector" placeholder="القطاع"><input id="clientCity" placeholder="المدينة"><input id="clientPhone" placeholder="الهاتف"><input id="clientEmail" placeholder="الإيميل"><select id="clientStatus"><option>جديد</option><option>تم الاتصال</option><option>تم إرسال عرض</option><option>زيارة ميدانية</option><option>تفاوض</option><option>تم التعاقد</option><option>رفض</option></select><input id="clientFollowup" type="date"><input id="clientValue" type="number" placeholder="القيمة المتوقعة"><textarea id="clientNotes" placeholder="ملاحظات"></textarea><button>حفظ العميل</button><button type="button" class="muted-btn" onclick="clearClient()">تفريغ</button></form></div>
+  <div class="admin-panel"><div class="panel-head"><h2>قائمة العملاء</h2><div><input id="clientSearch" placeholder="بحث..." oninput="renderClients()"><button onclick="exportTable('clients')">CSV</button></div></div><div class="table-wrap"><table><thead><tr><th>العميل</th><th>القطاع</th><th>الهاتف</th><th>الحالة</th><th>المتابعة</th><th>القيمة</th><th>إجراء</th></tr></thead><tbody id="clientsRows"></tbody></table></div></div>
+</section>
+
+<section class="admin-view" id="view-workers">
+  <div class="admin-panel"><h2>إضافة / تعديل عامل</h2><form id="workerForm" class="smart-form"><input type="hidden" id="workerId"><input id="workerName" required placeholder="اسم العامل"><input id="workerPhone" placeholder="الهاتف"><input id="workerJob" placeholder="الوظيفة"><input id="workerSalary" type="number" placeholder="الراتب"><input id="workerStart" type="date"><select id="workerStatus"><option>نشط</option><option>إجازة</option><option>موقوف</option><option>منتهي</option></select><input id="workerNationalId" placeholder="الرقم القومي"><textarea id="workerNotes" placeholder="ملاحظات"></textarea><button>حفظ العامل</button><button type="button" class="muted-btn" onclick="clearWorker()">تفريغ</button></form></div>
+  <div class="admin-panel"><div class="panel-head"><h2>قائمة العمال</h2><button onclick="exportTable('workers')">CSV</button></div><div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الوظيفة</th><th>الراتب</th><th>الحالة</th><th>تاريخ البدء</th><th>إجراء</th></tr></thead><tbody id="workersRows"></tbody></table></div></div>
+</section>
+
+<section class="admin-view" id="view-attendance"><div class="admin-panel"><h2>تسجيل الحضور والغياب</h2><form id="attendanceForm" class="smart-form"><select id="attWorker" required></select><input id="attDate" type="date" required><select id="attStatus"><option>حاضر</option><option>غائب بعذر</option><option>غائب بدون عذر</option><option>إجازة</option></select><input id="attIn" type="time"><input id="attOut" type="time"><input id="attHours" type="number" step=".5" placeholder="الساعات"><textarea id="attNotes" placeholder="ملاحظات"></textarea><button>حفظ السجل</button></form></div><div class="admin-panel"><div class="table-wrap"><table><thead><tr><th>العامل</th><th>التاريخ</th><th>الحالة</th><th>دخول</th><th>خروج</th><th>ساعات</th><th>إجراء</th></tr></thead><tbody id="attendanceRows"></tbody></table></div></div></section>
+
+<section class="admin-view" id="view-assignments"><div class="admin-panel"><h2>توزيع العمال على مواقع العمل</h2><form id="assignmentForm" class="smart-form"><select id="asWorker" required></select><input id="asDate" type="date" required><input id="asSite" required placeholder="اسم العميل / الموقع"><input id="asAddress" placeholder="العنوان"><input id="asStart" type="time"><input id="asEnd" type="time"><input id="asSupervisor" placeholder="المشرف"><textarea id="asNotes" placeholder="التعليمات"></textarea><button>إضافة المهمة</button></form></div><div class="admin-panel"><div class="table-wrap"><table><thead><tr><th>العامل</th><th>التاريخ</th><th>الموقع</th><th>العنوان</th><th>الوقت</th><th>المشرف</th><th>إجراء</th></tr></thead><tbody id="assignmentsRows"></tbody></table></div></div></section>
+
+<section class="admin-view" id="view-insurance"><div class="admin-grid-2"><div class="admin-panel"><h2>التأمينات والرواتب</h2><form id="insuranceForm" class="smart-form one-col"><select id="insWorker" required></select><input id="insMonth" type="month" required><input id="insSalary" type="number" placeholder="الراتب الأساسي"><input id="insInsurance" type="number" placeholder="قيمة التأمين"><input id="insBonus" type="number" placeholder="حوافز"><input id="insDeduction" type="number" placeholder="خصومات"><select id="insStatus"><option>قيد المراجعة</option><option>تم الدفع</option></select><button>حفظ</button></form></div><div class="admin-panel"><h2>السجلات</h2><div class="table-wrap"><table><thead><tr><th>العامل</th><th>الشهر</th><th>صافي الراتب</th><th>التأمين</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="insuranceRows"></tbody></table></div></div></div></section>
+
+<section class="admin-view" id="view-inventory"><div class="admin-panel"><h2>الأدوات والمخزون</h2><form id="inventoryForm" class="smart-form"><input id="invName" required placeholder="اسم الأداة / المادة"><input id="invCategory" placeholder="الفئة"><input id="invQty" type="number" placeholder="الكمية"><input id="invMin" type="number" placeholder="الحد الأدنى"><input id="invUnit" placeholder="الوحدة"><input id="invAssigned" placeholder="مُسلّمة إلى"><select id="invCondition"><option>جديدة</option><option>جيدة</option><option>تحتاج صيانة</option><option>تالفة</option></select><textarea id="invNotes" placeholder="ملاحظات"></textarea><button>حفظ الصنف</button></form></div><div class="admin-panel"><div class="table-wrap"><table><thead><tr><th>الصنف</th><th>الفئة</th><th>الكمية</th><th>الحد الأدنى</th><th>الحالة</th><th>مسلمة إلى</th><th>إجراء</th></tr></thead><tbody id="inventoryRows"></tbody></table></div></div></section>
+
+<section class="admin-view" id="view-contracts"><div class="admin-panel"><h2>العقود والفواتير</h2><form id="contractForm" class="smart-form"><input id="conClient" required placeholder="اسم العميل"><input id="conService" placeholder="الخدمة"><input id="conStart" type="date"><input id="conEnd" type="date"><input id="conValue" type="number" placeholder="قيمة العقد"><select id="conStatus"><option>عرض</option><option>نشط</option><option>مكتمل</option><option>متوقف</option></select><input id="conInvoice" placeholder="رقم الفاتورة"><select id="conPayment"><option>غير مدفوع</option><option>مدفوع جزئياً</option><option>مدفوع</option></select><textarea id="conNotes" placeholder="ملاحظات"></textarea><button>حفظ العقد</button></form></div><div class="admin-panel"><div class="table-wrap"><table><thead><tr><th>العميل</th><th>الخدمة</th><th>المدة</th><th>القيمة</th><th>الحالة</th><th>الدفع</th><th>إجراء</th></tr></thead><tbody id="contractsRows"></tbody></table></div></div></section>
+
+<section class="admin-view" id="view-quotes"><div class="admin-grid-2"><div class="admin-panel"><h2>إنشاء عرض سعر</h2><form id="quoteForm" class="smart-form one-col"><input id="qClient" required placeholder="اسم العميل"><input id="qService" value="خدمات تنظيف احترافية"><input id="qAmount" type="number" placeholder="القيمة بالجنيه"><input id="qDuration" value="شهري" placeholder="مدة العرض"><textarea id="qDetails" placeholder="تفاصيل العرض"></textarea><button>إنشاء العرض</button></form></div><div class="admin-panel"><div id="quotePreview" class="quote-preview"><h2>معاينة عرض السعر</h2><p>املأ البيانات لإنشاء عرض قابل للطباعة أو الحفظ PDF.</p></div></div></div></section>
+</div></div>
+<script src="admin.js"></script></body></html>
